@@ -230,7 +230,7 @@ details li{margin:5px 0 5px 18px;line-height:1.55;}
       <button class="diffbtn" data-d="hard" onclick="setDiff('hard')">🔥 어려움</button>
     </div>
     <div class="homebtns">
-      <button class="bigbtn blue" onclick="show('manage')">📚 단어장 설정</button>
+      <button class="bigbtn blue" onclick="openManage()">📚 단어장 설정</button>
       <button class="bigbtn gray" onclick="showBoard()">🏆 명예의 전당</button>
       <button class="bigbtn gray" onclick="alert(HELPTEXT)">❓ 도움말</button>
     </div>
@@ -1345,10 +1345,18 @@ function renderRows(rows){
       `<td class="bscore">${r.s}점</td><td class="bdate">${isNaN(d)?'':(d.getMonth()+1)+'.'+d.getDate()}</td></tr>`;
   }).join('')+'</table>';
 }
-function resetBoard(){ // 교사 전용: 비밀번호 필요
+/* 교사 인증 (한 번 통과하면 창을 닫기 전까지 유지) */
+let TEACHER_OK=false;
+function askTeacher(){
+  if(TEACHER_OK) return true;
   const pin = prompt('🔒 선생님 비밀번호를 입력하세요');
-  if(pin === null) return;
-  if(pin !== (PRESET.pin || '1234')){ alert('비밀번호가 달라요! 선생님께 물어보세요 😊'); return; }
+  if(pin === null) return false;
+  if(pin !== (PRESET.pin || '1234')){ alert('비밀번호가 달라요! 선생님께 물어보세요 😊'); return false; }
+  TEACHER_OK=true; return true;
+}
+function openManage(){ if(askTeacher()) show('manage'); }
+function resetBoard(){ // 교사 전용
+  if(!askTeacher()) return;
   if(confirm('이 컴퓨터의 기록을 모두 지울까요? (공유 순위판 기록은 구글 시트에서 직접 지울 수 있어요)')){
     store.del('wp_board'); renderBoard();
   }
