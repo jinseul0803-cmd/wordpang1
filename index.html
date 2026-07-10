@@ -394,7 +394,8 @@ const HELPTEXT = `🎮 워드팡! 사용법
 /* ▼▼ 웹앱으로 배포할 때: 아래 두 칸에 주소를 넣으면 모든 학생에게 자동 적용됩니다 ▼▼ */
 const PRESET = {
   sheet: 'https://docs.google.com/spreadsheets/d/1-sKbrXDoOEyihOpECnH6aAr0VBq8S2Xu/edit?usp=sharing',  // 구글 시트(단어장) 주소
-  board: 'https://script.google.com/macros/s/AKfycbxriJpk56GMdZ63ECbBLF8CTtNjVNkddsjNqj2FNooc6fhzViMqL6I8FUix2rFfGbDA/exec'   // 앱스크립트 웹 앱(공유 순위판) 주소
+  board: 'https://script.google.com/macros/s/AKfycbxriJpk56GMdZ63ECbBLF8CTtNjVNkddsjNqj2FNooc6fhzViMqL6I8FUix2rFfGbDA/exec',    // 앱스크립트 웹 앱(공유 순위판) 주소
+  pin: '1234'   // 선생님 비밀번호 (기록 삭제용 — 꼭 바꿔 주세요!)
 };
 /* 저장소 안전 래퍼 (일부 환경에서 localStorage가 막혀도 게임이 죽지 않게) */
 const store = {
@@ -1344,7 +1345,10 @@ function renderRows(rows){
       `<td class="bscore">${r.s}점</td><td class="bdate">${isNaN(d)?'':(d.getMonth()+1)+'.'+d.getDate()}</td></tr>`;
   }).join('')+'</table>';
 }
-function resetBoard(){
+function resetBoard(){ // 교사 전용: 비밀번호 필요
+  const pin = prompt('🔒 선생님 비밀번호를 입력하세요');
+  if(pin === null) return;
+  if(pin !== (PRESET.pin || '1234')){ alert('비밀번호가 달라요! 선생님께 물어보세요 😊'); return; }
   if(confirm('이 컴퓨터의 기록을 모두 지울까요? (공유 순위판 기록은 구글 시트에서 직접 지울 수 있어요)')){
     store.del('wp_board'); renderBoard();
   }
